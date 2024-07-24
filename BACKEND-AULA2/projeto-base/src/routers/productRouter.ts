@@ -1,5 +1,5 @@
 import { Router } from "express";
-import ProductController from "../controllers/productsController.js";
+import ProductController from "../controllers/productController.js";
 
 const router: Router = Router();
 
@@ -9,7 +9,7 @@ router.get('/products', ProductController.getAll);
 
 
 // get product by id 
-router.get('/products/:id', ProductController.getOne);
+router.get('/products/:id', ProductController.getProductById);
     
     
 // create new product 

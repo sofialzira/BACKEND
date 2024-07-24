@@ -1,5 +1,5 @@
 export interface IProduct {
-    "id": number,
+    "id": string,
     "title": string,
     "description"?: string,
     "category": string,
@@ -10,8 +10,7 @@ export interface IProduct {
 }
 
 export interface IUser {
-    id: number;
-    name: string;
+    id: string;
     email: string;
     password?: string;
 }
