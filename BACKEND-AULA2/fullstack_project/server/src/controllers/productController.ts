@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { IProduct } from "../interfaces/interfaces.js";
 import productService from "../services/productService.js";
+import { validationResult } from "express-validator";
 
 const productsFilePath = './src/data/products.json';
 
@@ -34,6 +35,12 @@ class ProductController {
 
     create = async (req: Request, res: Response) => {
         try {
+            const errors = validationResult(req);
+            
+            if  (!errors.isEmpty()) {
+                res.status(400).json({ errors: errors.array() })
+            }
+
             const productToCreate: IProduct = req.body;
             const createProduct: any = productService.create(productToCreate);
             res.status(201).json(createProduct)
