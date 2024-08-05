@@ -1,41 +1,43 @@
-import { IUser } from '../interfaces/interfaces.js';
+import { IUser } from '../models/userModel.js';
 import JsonFileReader from '../utils/jsonFileReader.js';
 import { v4 as uuidv4 } from 'uuid';
 import bcrypt from 'bcrypt';
+import UserModel from '../models/userModel.js';
 
-const usersJsonPath: string = './src/data/users.json';
+// const usersJsonPath: string = './src/data/users.json';
 
 class UserService {
-  private readUsersJson(): IUser[] | undefined {
-    try {
-      const data = JsonFileReader.read(usersJsonPath);
-      return data;
-    } catch (error) {
-      throw new Error('Failed to read users from file');
-    }
-  }
+  // private readUsersJson(): IUser[] | undefined {
+  //   try {
+  //     const data = JsonFileReader.read(usersJsonPath);
+  //     return data;
+  //   } catch (error) {
+  //     throw new Error('Failed to read users from file');
+  //   }
+  // }
 
-  private writeUsersJson(users: IUser[]): void {
-    try {
-        JsonFileReader.write(usersJsonPath, users);
+  // private writeUsersJson(users: IUser[]): void {
+  //   try {
+  //       JsonFileReader.write(usersJsonPath, users);
 
-    } catch (error) {
-        throw new Error('Failed to write users to file');
-    }
-  }
+  //   } catch (error) {
+  //       throw new Error('Failed to write users to file');
+  //   }
+  // }
 
-  getAll = (): IUser[] | undefined => {
+  getAll = async (): Promise<IUser[] | undefined> => {
     try {
-      return this.readUsersJson();
+      return await UserModel.find();
     } catch (error) {
       throw new Error('Failed to get all users');
     }
   }
 
-  getUserById = (userId: string): IUser | undefined => {
+  getUserById = async (userId: string): Promise<IUser | null> => {
     try {
-      const users: IUser[] | undefined = this.readUsersJson();
-      const foundUser = users?.find(user => user.id === userId);
+      
+      const foundUser: IUser | null = await UserModel.findById(userId);
+      
       return foundUser;
     } catch (error) {
       throw new Error('Failed to get user by ID');
@@ -44,37 +46,43 @@ class UserService {
 
   register = async (newUser: IUser): Promise<IUser> => {
     try {
-        const users: IUser[] | undefined = this.readUsersJson();
-        if(!users) {
-            throw new Error ('failed to read users');
-        }
+        newUser.id = uuidv4();
+        newUser.password = await bcrypt.hash(newUser.password, 7);
+        const registerUser = await UserModel.create(newUser);
+        console.log(registerUser);
 
         
-        newUser.id = uuidv4();
-        newUser.password = await bcrypt.hash(newUser.password, 7)
-        users?.push(newUser);
-        this.writeUsersJson(users);
+        
+        // users?.push(newUser);
+        // this.writeUsersJson(users);
 
-        return newUser;
+        return registerUser;
 
     } catch (error) {
         throw new Error('Failed to create user');
     }
   }
 
-  update = async () => {
+  update = async (userId: string, user: IUser): Promise<IUser | null> => {
     try {
-
+      
+      const updatedUser = await UserModel.findByIdAndUpdate(userId, user, { new: true });
+      return updatedUser;
+    
     } catch (error) {
-      // console.log(error);
+
+      throw new Error('Failed to update user');
     }
   }
 
-  delete = async () => {
+  delete = async (userId: string): Promise <IUser | null> => {
     try {
 
+      const deletedUser = await UserModel.findByIdAndDelete(userId);
+      return deletedUser;
+
     } catch (error) {
-      // console.log(error);
+      throw new Error('Failed to delete user');
     }
   }
 }

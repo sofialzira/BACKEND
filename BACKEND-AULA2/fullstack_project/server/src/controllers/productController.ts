@@ -1,15 +1,16 @@
 import { Request, Response } from "express";
-import { IProduct } from "../interfaces/interfaces.js";
+import { IProduct } from '../models/productModel.js';
 import productService from "../services/productService.js";
 import { validationResult } from "express-validator";
 
-const productsFilePath = './src/data/products.json';
+// const productsFilePath = './src/data/products.json';
 
 class ProductController {
   
     getAll = async (req: Request, res: Response) => { 
         try {
             const products: IProduct[] | undefined = await productService.getAll();
+            console.log(products);
 
             res.json(products);
         } catch (error) {
@@ -20,10 +21,11 @@ class ProductController {
     getProductById = async (req: Request, res: Response) => {
         try {
             const productId: string = req.params.id;
-            const product: IProduct | undefined = productService.getProductById(productId);
 
-            if(!product) {
-                res.status(404).json({ error: 'product not found'});
+            const product = await productService.getProductById(productId);
+
+            if(product === null ) { // TO DO
+               return res.status(404).json({ error: 'product not found'});
             }
 
             res.json(product);
@@ -36,14 +38,15 @@ class ProductController {
     create = async (req: Request, res: Response) => {
         try {
             const errors = validationResult(req);
-            
+            const image = req.files?.image;
+
             if  (!errors.isEmpty()) {
-                res.status(400).json({ errors: errors.array() })
-            }
+                return res.status(400).json({ errors: errors.array() })
+            };
 
             const productToCreate: IProduct = req.body;
-            const createProduct: any = productService.create(productToCreate);
-            res.status(201).json(createProduct)
+            const createProduct: any = await productService.create(productToCreate);
+            res.status(201).json(createProduct);
 
         } catch (error) {
             res.status(500).json({ error: 'failed to create product' });
@@ -54,7 +57,8 @@ class ProductController {
         try {
             const productId: string = req.params.id;
             const productToUpdate: IProduct = req.body;
-            const updatedProduct: IProduct | undefined = productService.update(productId, productToUpdate);
+            const updatedProduct = await productService.update(productId, productToUpdate);
+            
             if(!updatedProduct) {
                 res.status(404).json( {error: 'Product not found'});
             }
@@ -68,9 +72,9 @@ class ProductController {
     delete = async (req: Request, res: Response) => {
         try {
             const productId: string = req.params.id;
-            const deletedProduct: IProduct | undefined = productService.delete(productId);
+            const deletedProduct = await productService.delete(productId);
 
-            if(!deletedProduct) {
+            if(!deletedProduct) {  // TO DO
                 res.status(404).json( {error: 'Product not found'});
             }
             res.json(deletedProduct);
