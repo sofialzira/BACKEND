@@ -1,31 +1,15 @@
 import { IUser } from '../models/userModel.js';
-import JsonFileReader from '../utils/jsonFileReader.js';
 import { v4 as uuidv4 } from 'uuid';
-import bcrypt from 'bcrypt';
 import UserModel from '../models/userModel.js';
+import bcrypt from 'bcrypt';
+import jwt from 'jsonwebtoken';
+import dotenv from 'dotenv';
 
-// const usersJsonPath: string = './src/data/users.json';
+dotenv.config();
+
 
 class UserService {
-  // private readUsersJson(): IUser[] | undefined {
-  //   try {
-  //     const data = JsonFileReader.read(usersJsonPath);
-  //     return data;
-  //   } catch (error) {
-  //     throw new Error('Failed to read users from file');
-  //   }
-  // }
-
-  // private writeUsersJson(users: IUser[]): void {
-  //   try {
-  //       JsonFileReader.write(usersJsonPath, users);
-
-  //   } catch (error) {
-  //       throw new Error('Failed to write users to file');
-  //   }
-  // }
-
-  getAll = async (): Promise<IUser[] | undefined> => {
+  getAll = async (): Promise<IUser[]> => {
     try {
       return await UserModel.find();
     } catch (error) {
@@ -46,18 +30,53 @@ class UserService {
 
   register = async (newUser: IUser): Promise<IUser> => {
     try {
-        newUser.id = uuidv4();
-        newUser.password = await bcrypt.hash(newUser.password, 7);
-        const registerUser = await UserModel.create(newUser);
-        console.log(registerUser);
+        const foundUser = await UserModel.findOne({ email: newUser.email });
 
-        
-        
-        // users?.push(newUser);
-        // this.writeUsersJson(users);
+        if(foundUser) { // TODO
+          throw new Error('Email already exists');
+        }
+
+        const hashedPassword = await bcrypt.hash(newUser.password, 10);
+        newUser.password = hashedPassword;
+
+        const registerUser = await UserModel.create(newUser);
+        // console.log(registerUser);
 
         return registerUser;
 
+    } catch (error) {
+        throw new Error('Failed to create user');
+    }
+  }
+
+
+
+  login = async (email: string, password: string): Promise<{ user: IUser, accessToken: string } | null> => {
+    try {
+        const foundUser = await UserModel.findOne({ email: email });
+
+        if(!foundUser) { // TODO
+          return null;
+        }
+
+        if (!await bcrypt.compare(password, foundUser.password)) {
+          return null;
+        }
+
+
+        let token = "";
+
+        if(process.env.SECRET_KEY) {
+          token = jwt.sign({
+            id: foundUser.id,
+            email: foundUser.email,
+            role: foundUser.role
+          }, process.env.SECRET_KEY);
+        } else {
+          throw new Error ('Cannot get secret key');
+        }
+       
+        return {user: foundUser, accessToken: token};
     } catch (error) {
         throw new Error('Failed to create user');
     }
