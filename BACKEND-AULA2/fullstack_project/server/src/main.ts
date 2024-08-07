@@ -12,13 +12,11 @@ dotenv.config();
 
 //console.log(process.env.MONGO_URI);
 
-
-app.use(express.json());
 app.use(fileUpload());
+app.use(express.json());
 app.use(cors());
 app.use(usersRouter);
 app.use(productsRouter);
-
 
 app.use(express.static("static"));
 

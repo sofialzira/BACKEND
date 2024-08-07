@@ -4,6 +4,8 @@ import UserModel from '../models/userModel.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
+import fileService from '../utils/fileService.js';
+
 
 dotenv.config();
 
@@ -28,13 +30,21 @@ class UserService {
     }
   }
 
-  register = async (newUser: IUser): Promise<IUser> => {
+  register = async (newUser: IUser, avatar: any): Promise<IUser> => {
     try {
         const foundUser = await UserModel.findOne({ email: newUser.email });
 
         if(foundUser) { // TODO
           throw new Error('Email already exists');
         }
+
+        let avatarName = "default.jpeg";
+
+        if(avatar) {
+          avatarName = fileService.save(avatar);
+        }
+
+        newUser.avatar = avatarName;
 
         const hashedPassword = await bcrypt.hash(newUser.password, 10);
         newUser.password = hashedPassword;
@@ -67,11 +77,13 @@ class UserService {
         let token = "";
 
         if(process.env.SECRET_KEY) {
+
           token = jwt.sign({
             id: foundUser.id,
             email: foundUser.email,
             role: foundUser.role
           }, process.env.SECRET_KEY);
+          
         } else {
           throw new Error ('Cannot get secret key');
         }
