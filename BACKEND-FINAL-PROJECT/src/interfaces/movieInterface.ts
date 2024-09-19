@@ -1,11 +1,10 @@
-// import { Document } from 'mongoose';
+import { Document } from 'mongoose';
 
 
-
-export default interface IMovie /* extends Document */ {
+export default interface IMovie extends Document {
 title: string;
 releaseDate: Date;
 trailerLink: string;
 posterUrl: string
-genders: string[];
+genres: string[];
 }
