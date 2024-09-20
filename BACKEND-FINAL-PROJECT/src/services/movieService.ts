@@ -56,7 +56,14 @@ class MovieService {
     }
   }
 
-  async delete() {}
+  async delete(movieId: string): Promise <IMovie | null> {
+    try {
+        const deletedMovie = await MovieModel.findByIdAndDelete(movieId);
+        return deletedMovie;
+    } catch (error) {
+        throw new Error ('Failed to delete movie');
+    }
+  }
 }
 
 export default new MovieService();

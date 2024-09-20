@@ -4,7 +4,7 @@ import cors from 'cors';
 import mongoose from 'mongoose';
 import fileUpload from 'express-fileupload';
 import movieRouter from './routers/movieRouter.js';
-
+import userRouter from './routers/userRouter.js';
 
 
 dotenv.config();
@@ -26,6 +26,7 @@ app.use(cors({
 
 app.use(express.json());
 app.use('/api', movieRouter);
+app.use('/api', userRouter);
 
 
 

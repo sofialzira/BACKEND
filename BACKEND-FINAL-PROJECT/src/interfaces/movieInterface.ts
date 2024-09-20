@@ -7,4 +7,4 @@ releaseDate: Date;
 trailerLink: string;
 posterUrl: string
 genres: string[];
-}
+} 

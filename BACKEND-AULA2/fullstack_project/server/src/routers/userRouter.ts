@@ -2,7 +2,7 @@ import { NextFunction, Router } from "express";
 import UserController from "../controllers/userController.js";
 import { check, validationResult } from 'express-validator';
 import { ExpressValidator } from "express-validator";
-import userController from "../controllers/userController.js";
+
 import { checkRole } from "../middlewares/authMiddleware.js";
 
 const router: Router = Router();

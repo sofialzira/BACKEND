@@ -1,6 +1,6 @@
 import {Request, Response, NextFunction} from 'express';
 import IMovie from '../interfaces/movieInterface.js';
-import movieService from '../services/movieService.js'
+import movieService from '../services/movieService.js';
 
 
 
@@ -12,7 +12,7 @@ class MovieController {
 
             res.json(movies);
         } catch (error) {
-            res.status(500).json({ error: 'failed to get movies'});
+            res.status(500).json({ error: 'failed to get movies' });
         }
     }
     async getOne(req: Request, res: Response, next: NextFunction) {
@@ -28,7 +28,7 @@ class MovieController {
             res.json(movie);
 
         } catch (error) {
-            res.status(500).json ({ error: 'failed to get movie' })
+            res.status(500).json ({ error: 'failed to get movie' });
         } 
     }
 
@@ -45,7 +45,7 @@ class MovieController {
 
 
         } catch (error) {
-            res.status(500).json ({ error: 'failed to get movie' })
+            res.status(500).json ({ error: 'failed to get movie' });
         } 
     }
 
@@ -76,16 +76,29 @@ class MovieController {
             const updatedMovie = await movieService.update(movieId, movieToUpdate);
 
             if(!updatedMovie) {
-                res.status(404).json( {error: 'Movie not found'});
+                res.status(404).json( {error: 'Movie not found'} );
             }
 
             res.json(updatedMovie);
         } catch (error) {
-            res.status(500).json({ error: 'Failed to update movie'});
+            res.status(500).json({ error: 'Failed to update movie' });
         }
     }
 
-    async delete(req: Request, res: Response, next: NextFunction) {}
+    async delete(req: Request, res: Response, next: NextFunction) {
+        try {
+            const movieId: string = req.params.id;
+            const deletedMovie = await movieService.delete(movieId);
+
+            if(!deletedMovie) {
+                res.status(404).json( {error: 'Movie not found' });
+            }
+
+            res.json(deletedMovie);
+        } catch (error) {
+            res.status(500).json( { error: 'Failed to delete movie' });
+        }
+    }
 
 }
 

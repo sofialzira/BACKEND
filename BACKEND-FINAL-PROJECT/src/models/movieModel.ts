@@ -19,7 +19,7 @@ const MovieSchema = new mongoose.Schema<IMovie>({
         default: 'no-image.png'
     },
     genres: { 
-        type: [String],
+        type: [String], 
         required: true
     },
 });
