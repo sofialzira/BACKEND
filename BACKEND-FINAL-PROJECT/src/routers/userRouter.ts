@@ -7,7 +7,7 @@ import { checkRole } from "../middlewares/authMiddleware.js";
 
 const router: Router = Router();
 
-router.get('/users', checkRole (["ADMIN", "USER"]), UserController.getAll);
+router.get('/users', checkRole (["ADMIN"]), UserController.getAll);
 router.get('/users/:id', UserController.getUserById);
 router.post('/users/register', [
     check("username").notEmpty().withMessage("Username is required."),
@@ -15,11 +15,13 @@ router.post('/users/register', [
     check("password").isStrongPassword(),
     check("role").isIn(["USER", "ADMIN"]).withMessage("Invalid role."),
 ], UserController.register);
+router.post('/users/login', [
+    check("email").isEmail().withMessage("Invalid email format."),
+    check("password").notEmpty().withMessage("Password is required.")
+], UserController.login);
 
-
-router.post('/users/login', UserController.login);
-// router.put();
-// router.delete();
+ router.put('/users/:id', checkRole(["ADMIN"]), UserController.update);
+ router.delete('/users/:id', checkRole([ "ADMIN"]), UserController.delete);
 
 
 export default router;

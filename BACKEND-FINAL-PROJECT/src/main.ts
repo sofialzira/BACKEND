@@ -17,14 +17,11 @@ const PORT = process.env.PORT || 7878;
 const app = express();
 
 app.use(fileUpload());
-
+app.use(express.json());
 app.use(express.static('static'));
-
 app.use(cors({
     origin:'*'
 }));
-
-app.use(express.json());
 app.use('/api', movieRouter);
 app.use('/api', userRouter);
 

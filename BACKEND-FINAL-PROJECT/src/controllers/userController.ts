@@ -69,6 +69,36 @@ class UserController {
         } 
     }
 
+    async update(req: Request, res: Response) {
+        try {
+            const userId: string = req.params.id;
+            const userToUpdate: IUser = req.body;
+            const updatedUser = await userService.update(userId, userToUpdate);
+
+            if(!updatedUser) {
+                res.status(404).json( {error: 'User not found'});
+            }
+
+            res.json(updatedUser);
+        } catch (error) {
+            res.status(500).json({ error: 'failed to update user' });
+        }
+    }
+
+    async delete(req: Request, res: Response) {
+        try {
+            const userId: string = req.params.id;
+            const deletedUser = await userService.delete(userId);
+
+            if(!deletedUser) {
+                res.status(404).json ( {error: 'User not found'});
+            }
+            res.json(deletedUser);
+        } catch (error) {
+            res.status(500).json({ error: 'failed to delete user'});
+        }
+    }
+
 }
 
 export default new UserController();

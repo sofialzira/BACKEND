@@ -4,7 +4,7 @@ import UserModel from '../models/userModel.js';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
-import fileService from '../utils/fileService.js';
+
 
 dotenv.config();
 
@@ -81,6 +81,28 @@ class UserService {
         }
       }
 
+      async update(userId: string, user: IUser): Promise<IUser | null> {
+        try {
+          
+          const updatedUser = await UserModel.findByIdAndUpdate(userId, user, { new: true });
+          return updatedUser;
+        
+        } catch (error) {
+    
+          throw new Error('Failed to update user');
+        }
+      }
+
+      async delete(userId: string): Promise <IUser | null> {
+        try {
+    
+          const deletedUser = await UserModel.findByIdAndDelete(userId);
+          return deletedUser;
+    
+        } catch (error) {
+          throw new Error('Failed to delete user');
+        }
+      }
 }
 
 export default new UserService();
